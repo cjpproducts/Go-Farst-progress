@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Portal progress configurations
+    match /portal/{configId} {
+      allow read: if true;
+      allow create, update: if isValidId(configId) && isValidConfig(request.resource.data);
+    }
+
+    // Connection testing
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}
+
+function isValidId(id) {
+  return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+}
+
+function isValidConfig(data) {
+  return data.keys().hasAll(['progressBar', 'controlCenterWeb', 'sellerPortalWeb', 'mainAppAndroid', 'partnerAppAndroid', 'estimatedDeliveryDate'])
+      && data.progressBar is int 
+      && data.progressBar >= 1 
+      && data.progressBar <= 100
+      && (data.controlCenterWeb == 'Yet to Start' || data.controlCenterWeb == 'Progressing' || data.controlCenterWeb == 'Completed')
+      && (data.sellerPortalWeb == 'Yet to Start' || data.sellerPortalWeb == 'Progressing' || data.sellerPortalWeb == 'Completed')
+      && (data.mainAppAndroid == 'Yet to Start' || data.mainAppAndroid == 'Progressing' || data.mainAppAndroid == 'Completed')
+      && (data.partnerAppAndroid == 'Yet to Start' || data.partnerAppAndroid == 'Progressing' || data.partnerAppAndroid == 'Completed')
+      && data.estimatedDeliveryDate is string
+      && data.estimatedDeliveryDate.size() <= 100;
+}

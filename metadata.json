@@ -1,0 +1,6 @@
+{
+  "name": "Polarith Web",
+  "description": "Go Farst - App development progress portal by Priyam Kesh",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

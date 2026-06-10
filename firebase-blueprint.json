@@ -1,0 +1,53 @@
+{
+  "entities": {
+    "PortalConfig": {
+      "title": "PortalConfig",
+      "description": "App development progress configuration settings",
+      "type": "object",
+      "properties": {
+        "progressBar": {
+          "type": "integer",
+          "description": "Progress percentage from 1 to 100"
+        },
+        "controlCenterWeb": {
+          "type": "string",
+          "enum": ["Yet to Start", "Progressing", "Completed"]
+        },
+        "sellerPortalWeb": {
+          "type": "string",
+          "enum": ["Yet to Start", "Progressing", "Completed"]
+        },
+        "mainAppAndroid": {
+          "type": "string",
+          "enum": ["Yet to Start", "Progressing", "Completed"]
+        },
+        "partnerAppAndroid": {
+          "type": "string",
+          "enum": ["Yet to Start", "Progressing", "Completed"]
+        },
+        "estimatedDeliveryDate": {
+          "type": "string",
+          "description": "Estimated Delivery Date"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "progressBar",
+        "controlCenterWeb",
+        "sellerPortalWeb",
+        "mainAppAndroid",
+        "partnerAppAndroid",
+        "estimatedDeliveryDate"
+      ]
+    }
+  },
+  "firestore": {
+    "/portal/{configId}": {
+      "schema": "PortalConfig",
+      "description": "Portal development progress details document"
+    }
+  }
+}
