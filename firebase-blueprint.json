@@ -13,17 +13,33 @@
           "type": "string",
           "enum": ["Yet to Start", "Progressing", "Completed"]
         },
+        "controlCenterWebProgress": {
+          "type": "integer",
+          "description": "Progress percentage from 0 to 100"
+        },
         "sellerPortalWeb": {
           "type": "string",
           "enum": ["Yet to Start", "Progressing", "Completed"]
+        },
+        "sellerPortalWebProgress": {
+          "type": "integer",
+          "description": "Progress percentage from 0 to 100"
         },
         "mainAppAndroid": {
           "type": "string",
           "enum": ["Yet to Start", "Progressing", "Completed"]
         },
+        "mainAppAndroidProgress": {
+          "type": "integer",
+          "description": "Progress percentage from 0 to 100"
+        },
         "partnerAppAndroid": {
           "type": "string",
           "enum": ["Yet to Start", "Progressing", "Completed"]
+        },
+        "partnerAppAndroidProgress": {
+          "type": "integer",
+          "description": "Progress percentage from 0 to 100"
         },
         "estimatedDeliveryDate": {
           "type": "string",

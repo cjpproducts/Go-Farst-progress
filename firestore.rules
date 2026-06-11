@@ -24,14 +24,18 @@ function isValidId(id) {
 }
 
 function isValidConfig(data) {
-  return data.keys().hasAll(['progressBar', 'controlCenterWeb', 'sellerPortalWeb', 'mainAppAndroid', 'partnerAppAndroid', 'estimatedDeliveryDate'])
+  return data.keys().hasAll(['progressBar', 'controlCenterWeb', 'controlCenterWebProgress', 'sellerPortalWeb', 'sellerPortalWebProgress', 'mainAppAndroid', 'mainAppAndroidProgress', 'partnerAppAndroid', 'partnerAppAndroidProgress', 'estimatedDeliveryDate'])
       && data.progressBar is int 
       && data.progressBar >= 1 
       && data.progressBar <= 100
       && (data.controlCenterWeb == 'Yet to Start' || data.controlCenterWeb == 'Progressing' || data.controlCenterWeb == 'Completed')
+      && data.controlCenterWebProgress is int && data.controlCenterWebProgress >= 0 && data.controlCenterWebProgress <= 100
       && (data.sellerPortalWeb == 'Yet to Start' || data.sellerPortalWeb == 'Progressing' || data.sellerPortalWeb == 'Completed')
+      && data.sellerPortalWebProgress is int && data.sellerPortalWebProgress >= 0 && data.sellerPortalWebProgress <= 100
       && (data.mainAppAndroid == 'Yet to Start' || data.mainAppAndroid == 'Progressing' || data.mainAppAndroid == 'Completed')
+      && data.mainAppAndroidProgress is int && data.mainAppAndroidProgress >= 0 && data.mainAppAndroidProgress <= 100
       && (data.partnerAppAndroid == 'Yet to Start' || data.partnerAppAndroid == 'Progressing' || data.partnerAppAndroid == 'Completed')
+      && data.partnerAppAndroidProgress is int && data.partnerAppAndroidProgress >= 0 && data.partnerAppAndroidProgress <= 100
       && data.estimatedDeliveryDate is string
       && data.estimatedDeliveryDate.size() <= 100;
 }

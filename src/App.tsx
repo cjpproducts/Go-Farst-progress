@@ -42,9 +42,13 @@ export default function App() {
   // Form Fields inside Admin View
   const [formProgress, setFormProgress] = useState(1);
   const [formControlCenter, setFormControlCenter] = useState<ModuleStatus>("Yet to Start");
+  const [formControlCenterProgress, setFormControlCenterProgress] = useState(0);
   const [formSellerPortal, setFormSellerPortal] = useState<ModuleStatus>("Yet to Start");
+  const [formSellerPortalProgress, setFormSellerPortalProgress] = useState(0);
   const [formMainApp, setFormMainApp] = useState<ModuleStatus>("Yet to Start");
+  const [formMainAppProgress, setFormMainAppProgress] = useState(0);
   const [formPartnerApp, setFormPartnerApp] = useState<ModuleStatus>("Yet to Start");
+  const [formPartnerAppProgress, setFormPartnerAppProgress] = useState(0);
   const [formDeliveryDate, setFormDeliveryDate] = useState("To Be Updated");
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -87,21 +91,29 @@ export default function App() {
           const fetchedData = snapshot.data() as PortalConfig;
           setConfig(fetchedData);
           
-          // Seed admin form fields with the current synced values
+          // Seed admin form fields with the current synced values (safeguard missing progress with ??)
           setFormProgress(fetchedData.progressBar);
           setFormControlCenter(fetchedData.controlCenterWeb);
+          setFormControlCenterProgress(fetchedData.controlCenterWebProgress ?? 0);
           setFormSellerPortal(fetchedData.sellerPortalWeb);
+          setFormSellerPortalProgress(fetchedData.sellerPortalWebProgress ?? 0);
           setFormMainApp(fetchedData.mainAppAndroid);
+          setFormMainAppProgress(fetchedData.mainAppAndroidProgress ?? 0);
           setFormPartnerApp(fetchedData.partnerAppAndroid);
+          setFormPartnerAppProgress(fetchedData.partnerAppAndroidProgress ?? 0);
           setFormDeliveryDate(fetchedData.estimatedDeliveryDate);
         } else {
           // Document does not exist: Seed with default clean state (remove all pre-completed progresses as per user request)
           const initial: PortalConfig = {
             progressBar: 1,
             controlCenterWeb: "Yet to Start",
+            controlCenterWebProgress: 0,
             sellerPortalWeb: "Yet to Start",
+            sellerPortalWebProgress: 0,
             mainAppAndroid: "Yet to Start",
+            mainAppAndroidProgress: 0,
             partnerAppAndroid: "Yet to Start",
+            partnerAppAndroidProgress: 0,
             estimatedDeliveryDate: "To Be Updated"
           };
           setDoc(docRef, initial)
@@ -145,9 +157,13 @@ export default function App() {
     const updatedPayload: PortalConfig = {
       progressBar: Math.max(1, Math.min(100, Number(formProgress))),
       controlCenterWeb: formControlCenter,
+      controlCenterWebProgress: Number(formControlCenterProgress),
       sellerPortalWeb: formSellerPortal,
+      sellerPortalWebProgress: Number(formSellerPortalProgress),
       mainAppAndroid: formMainApp,
+      mainAppAndroidProgress: Number(formMainAppProgress),
       partnerAppAndroid: formPartnerApp,
+      partnerAppAndroidProgress: Number(formPartnerAppProgress),
       estimatedDeliveryDate: formDeliveryDate,
     };
 
@@ -196,9 +212,13 @@ export default function App() {
   const data = config || {
     progressBar: 1,
     controlCenterWeb: "Yet to Start" as ModuleStatus,
+    controlCenterWebProgress: 0,
     sellerPortalWeb: "Yet to Start" as ModuleStatus,
+    sellerPortalWebProgress: 0,
     mainAppAndroid: "Yet to Start" as ModuleStatus,
+    mainAppAndroidProgress: 0,
     partnerAppAndroid: "Yet to Start" as ModuleStatus,
+    partnerAppAndroidProgress: 0,
     estimatedDeliveryDate: "To Be Updated"
   };
 
@@ -207,19 +227,19 @@ export default function App() {
     switch (status) {
       case "Completed":
         return (
-          <span className="inline-flex items-center px-3 py-1 text-xs font-bold font-mono uppercase tracking-wider bg-blue-600 text-white rounded-none border border-blue-700">
+          <span className="inline-flex items-center px-3 py-1 text-[10px] font-bold font-mono uppercase tracking-wider bg-blue-600 text-white rounded-none border border-blue-700">
             Completed
           </span>
         );
       case "Progressing":
         return (
-          <span className="inline-flex items-center px-3 py-1 text-xs font-bold font-mono uppercase tracking-wider bg-black text-white rounded-none border border-black">
+          <span className="inline-flex items-center px-3 py-1 text-[10px] font-bold font-mono uppercase tracking-wider bg-black text-white rounded-none border border-black">
             Progressing
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-3 py-1 text-xs font-bold font-mono uppercase tracking-wider bg-white text-slate-400 rounded-none border border-slate-200">
+          <span className="inline-flex items-center px-3 py-1 text-[10px] font-bold font-mono uppercase tracking-wider bg-white text-slate-400 rounded-none border border-slate-200">
             Yet to Start
           </span>
         );
@@ -240,7 +260,7 @@ export default function App() {
       {!isAdminView ? (
         // PUBLIC VIEW PORTAL
         <main className="max-w-4xl mx-auto px-4 pt-20 sm:px-6">
-          {/* Header Layout - Logo Removed at user's instruction */}
+          {/* Header Layout */}
           <div className="text-center mb-16 border-b-2 border-black pb-10">
             <motion.div 
               initial={{ opacity: 0, y: -5 }}
@@ -291,10 +311,10 @@ export default function App() {
               </span>
             </div>
 
-            {/* Sharp Visual Progress Track - No neon, No rounded edges, Clean flat filled color */}
-            <div className="relative w-full h-8 bg-slate-100 border-2 border-black rounded-none mb-6">
+            {/* Sharp Visual Progress Track - No neon, No rounded edges, Classic stripe right-to-left flowing pattern */}
+            <div className="relative w-full h-8 bg-slate-100 border-2 border-black rounded-none mb-6 overflow-hidden">
               <motion.div 
-                className="absolute top-0 left-0 h-full bg-blue-600 rounded-none"
+                className="absolute top-0 left-0 h-full bg-blue-600 stripe-animation rounded-none"
                 initial={{ width: 0 }}
                 animate={{ width: `${data.progressBar}%` }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
@@ -332,7 +352,7 @@ export default function App() {
             </div>
           </motion.div>
 
-          {/* Development Modules (4 Boxes Grid - 90 degree sharp corners, flat border, hover solid border effect) */}
+          {/* Development Modules (4 Boxes Grid - 90 degree sharp corners, flat border, with matching animated purple progress bars) */}
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -340,74 +360,146 @@ export default function App() {
             className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16"
           >
             {/* Box 1: control center (Web) */}
-            <div className="bg-white rounded-none border-2 border-slate-200 hover:border-black p-6 flex flex-col justify-between transition-colors duration-200">
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-2 border border-slate-200 text-black">
-                    <Globe className="w-4 h-4" />
+            <div className="bg-white rounded-none border-2 border-slate-200 hover:border-black p-6 flex flex-col justify-between transition-all duration-200 min-h-[290px]">
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="p-2 border border-slate-200 text-black">
+                      <Globe className="w-4 h-4" />
+                    </div>
+                    {renderStatusBadge(data.controlCenterWeb)}
                   </div>
-                  {renderStatusBadge(data.controlCenterWeb)}
+                  <h3 className="text-base font-bold text-black font-mono uppercase tracking-tight">
+                    control center (Web)
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed mb-6">
+                    Web-based control console, configurations manager, parameter variables dashboard, and real-time synchronization backend pipeline.
+                  </p>
                 </div>
-                <h3 className="text-base font-bold text-black font-mono uppercase tracking-tight">
-                  control center (Web)
-                </h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  Web-based control console, configurations manager, parameter variables dashboard, and real-time synchronization backend pipeline.
-                </p>
+                
+                {/* Purple Progress Bar - Rounded-none, Stripe right-to-left animated */}
+                <div className="mt-auto pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-1.5 font-mono text-[11px] font-bold">
+                    <span className="text-slate-400">MODULE PROGRESS</span>
+                    <span className="text-purple-600">{data.controlCenterWebProgress ?? 0}%</span>
+                  </div>
+                  <div className="relative w-full h-5 bg-slate-100 border-2 border-black rounded-none overflow-hidden">
+                    <motion.div 
+                      className="absolute top-0 left-0 h-full bg-purple-600 stripe-animation rounded-none"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${data.controlCenterWebProgress ?? 0}%` }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Box 2: seller portal (Web) */}
-            <div className="bg-white rounded-none border-2 border-slate-200 hover:border-black p-6 flex flex-col justify-between transition-colors duration-200">
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-2 border border-slate-200 text-black">
-                    <Building2 className="w-4 h-4" />
+            <div className="bg-white rounded-none border-2 border-slate-200 hover:border-black p-6 flex flex-col justify-between transition-all duration-200 min-h-[290px]">
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="p-2 border border-slate-200 text-black">
+                      <Building2 className="w-4 h-4" />
+                    </div>
+                    {renderStatusBadge(data.sellerPortalWeb)}
                   </div>
-                  {renderStatusBadge(data.sellerPortalWeb)}
+                  <h3 className="text-base font-bold text-black font-mono uppercase tracking-tight">
+                    seller portal (Web)
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed mb-6">
+                    Merchant dashboard platform featuring stock management boards, product listings controls, checkout tracking, and core billing data sets.
+                  </p>
                 </div>
-                <h3 className="text-base font-bold text-black font-mono uppercase tracking-tight">
-                  seller portal (Web)
-                </h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  Merchant dashboard platform featuring stock management boards, product listings controls, checkout tracking, and core billing data sets.
-                </p>
+
+                {/* Purple Progress Bar - Rounded-none, Stripe right-to-left animated */}
+                <div className="mt-auto pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-1.5 font-mono text-[11px] font-bold">
+                    <span className="text-slate-400">MODULE PROGRESS</span>
+                    <span className="text-purple-600">{data.sellerPortalWebProgress ?? 0}%</span>
+                  </div>
+                  <div className="relative w-full h-5 bg-slate-100 border-2 border-black rounded-none overflow-hidden">
+                    <motion.div 
+                      className="absolute top-0 left-0 h-full bg-purple-600 stripe-animation rounded-none"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${data.sellerPortalWebProgress ?? 0}%` }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Box 3: Main app (android) */}
-            <div className="bg-white rounded-none border-2 border-slate-200 hover:border-black p-6 flex flex-col justify-between transition-colors duration-200">
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-2 border border-slate-200 text-black">
-                    <Smartphone className="w-4 h-4" />
+            <div className="bg-white rounded-none border-2 border-slate-200 hover:border-black p-6 flex flex-col justify-between transition-all duration-200 min-h-[290px]">
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="p-2 border border-slate-200 text-black">
+                      <Smartphone className="w-4 h-4" />
+                    </div>
+                    {renderStatusBadge(data.mainAppAndroid)}
                   </div>
-                  {renderStatusBadge(data.mainAppAndroid)}
+                  <h3 className="text-base font-bold text-black font-mono uppercase tracking-tight">
+                    Main app (android)
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed mb-6">
+                    Native Android mobile environment comprising clean customer account sign-in/up routes, visual products display, and local app cache rules.
+                  </p>
                 </div>
-                <h3 className="text-base font-bold text-black font-mono uppercase tracking-tight">
-                  Main app (android)
-                </h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  Native Android mobile environment comprising clean customer account sign-in/up routes, visual products display, and local app cache rules.
-                </p>
+
+                {/* Purple Progress Bar - Rounded-none, Stripe right-to-left animated */}
+                <div className="mt-auto pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-1.5 font-mono text-[11px] font-bold">
+                    <span className="text-slate-400">MODULE PROGRESS</span>
+                    <span className="text-purple-600">{data.mainAppAndroidProgress ?? 0}%</span>
+                  </div>
+                  <div className="relative w-full h-5 bg-slate-100 border-2 border-black rounded-none overflow-hidden">
+                    <motion.div 
+                      className="absolute top-0 left-0 h-full bg-purple-600 stripe-animation rounded-none"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${data.mainAppAndroidProgress ?? 0}%` }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Box 4: Partner app (Android) */}
-            <div className="bg-white rounded-none border-2 border-slate-200 hover:border-black p-6 flex flex-col justify-between transition-colors duration-200">
-              <div>
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-2 border border-slate-200 text-black">
-                    <Smartphone className="w-4 h-4" />
+            <div className="bg-white rounded-none border-2 border-slate-200 hover:border-black p-6 flex flex-col justify-between transition-all duration-200 min-h-[290px]">
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="p-2 border border-slate-200 text-black">
+                      <Smartphone className="w-4 h-4" />
+                    </div>
+                    {renderStatusBadge(data.partnerAppAndroid)}
                   </div>
-                  {renderStatusBadge(data.partnerAppAndroid)}
+                  <h3 className="text-base font-bold text-black font-mono uppercase tracking-tight">
+                    Partner app (Android)
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-2 leading-relaxed mb-6">
+                    Fulfillment application tailored for couriers, dispatchers, and order processors including real-time alerts and state updates.
+                  </p>
                 </div>
-                <h3 className="text-base font-bold text-black font-mono uppercase tracking-tight">
-                  Partner app (Android)
-                </h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  Fulfillment application tailored for couriers, dispatchers, and order processors including real-time alerts and state updates.
-                </p>
+
+                {/* Purple Progress Bar - Rounded-none, Stripe right-to-left animated */}
+                <div className="mt-auto pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-1.5 font-mono text-[11px] font-bold">
+                    <span className="text-slate-400">MODULE PROGRESS</span>
+                    <span className="text-purple-600">{data.partnerAppAndroidProgress ?? 0}%</span>
+                  </div>
+                  <div className="relative w-full h-5 bg-slate-100 border-2 border-black rounded-none overflow-hidden">
+                    <motion.div 
+                      className="absolute top-0 left-0 h-full bg-purple-600 stripe-animation rounded-none"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${data.partnerAppAndroidProgress ?? 0}%` }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -522,7 +614,7 @@ export default function App() {
               )}
 
               <form onSubmit={handleSaveChangesSubmit} className="space-y-6">
-                {/* Progress bar controller */}
+                {/* Progress bar controller - Overall */}
                 <div className="bg-slate-50 p-5 border border-slate-200">
                   <div className="flex justify-between items-baseline mb-3">
                     <label htmlFor="progress-slider" className="block text-xs font-bold uppercase tracking-wider font-mono text-black">
@@ -548,23 +640,34 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 4 module state boxes controller */}
-                <div className="space-y-4 pt-4 border-t-2 border-black">
+                {/* 4 module state boxes controller with integrated sliders and auto-triggers */}
+                <div className="space-y-6 pt-6 border-t-2 border-black">
                   <h3 className="text-xs font-bold uppercase tracking-wider font-mono text-slate-500">
-                    Application Modules Flags
+                    Application Modules Flags & Progress
                   </h3>
 
                   {/* 1. Control Center */}
-                  <div className="bg-slate-50 p-4 rounded-none border border-slate-200">
-                    <label className="block text-xs font-bold uppercase tracking-wider font-mono text-black mb-3">
-                      control center (Web)
-                    </label>
+                  <div className="bg-slate-50 p-4 rounded-none border border-slate-200 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-bold uppercase tracking-wider font-mono text-black">
+                        control center (Web)
+                      </label>
+                      <span className="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 border border-purple-200">
+                        {formControlCenterProgress}%
+                      </span>
+                    </div>
+
                     <div className="grid grid-cols-3 gap-2">
                       {(["Yet to Start", "Progressing", "Completed"] as ModuleStatus[]).map((status) => (
                         <button
                           key={status}
                           type="button"
-                          onClick={() => setFormControlCenter(status)}
+                          onClick={() => {
+                            setFormControlCenter(status);
+                            if (status === "Completed") setFormControlCenterProgress(100);
+                            if (status === "Yet to Start") setFormControlCenterProgress(0);
+                            if (status === "Progressing" && formControlCenterProgress === 0) setFormControlCenterProgress(25);
+                          }}
                           className={`py-2 text-[10px] sm:text-xs font-bold font-mono uppercase tracking-wider rounded-none border transition-all ${
                             formControlCenter === status
                               ? "bg-blue-600 border-blue-600 text-white"
@@ -575,19 +678,55 @@ export default function App() {
                         </button>
                       ))}
                     </div>
+
+                    <div className="pt-2 border-t border-slate-200">
+                      <div className="flex justify-between text-[10px] font-mono font-bold text-slate-400 mb-1">
+                        <span>MODULE PROGRESS</span>
+                        <span>{formControlCenterProgress}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={formControlCenterProgress}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setFormControlCenterProgress(val);
+                          if (val === 100) {
+                            setFormControlCenter("Completed");
+                          } else if (val === 0) {
+                            setFormControlCenter("Yet to Start");
+                          } else {
+                            setFormControlCenter("Progressing");
+                          }
+                        }}
+                        className="w-full accent-purple-600 cursor-pointer rounded-none"
+                      />
+                    </div>
                   </div>
 
                   {/* 2. Seller Portal */}
-                  <div className="bg-slate-50 p-4 rounded-none border border-slate-200">
-                    <label className="block text-xs font-bold uppercase tracking-wider font-mono text-black mb-3">
-                      seller portal (Web)
-                    </label>
+                  <div className="bg-slate-50 p-4 rounded-none border border-slate-200 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-bold uppercase tracking-wider font-mono text-black">
+                        seller portal (Web)
+                      </label>
+                      <span className="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 border border-purple-200">
+                        {formSellerPortalProgress}%
+                      </span>
+                    </div>
+
                     <div className="grid grid-cols-3 gap-2">
                       {(["Yet to Start", "Progressing", "Completed"] as ModuleStatus[]).map((status) => (
                         <button
                           key={status}
                           type="button"
-                          onClick={() => setFormSellerPortal(status)}
+                          onClick={() => {
+                            setFormSellerPortal(status);
+                            if (status === "Completed") setFormSellerPortalProgress(100);
+                            if (status === "Yet to Start") setFormSellerPortalProgress(0);
+                            if (status === "Progressing" && formSellerPortalProgress === 0) setFormSellerPortalProgress(25);
+                          }}
                           className={`py-2 text-[10px] sm:text-xs font-bold font-mono uppercase tracking-wider rounded-none border transition-all ${
                             formSellerPortal === status
                               ? "bg-blue-600 border-blue-600 text-white"
@@ -598,19 +737,55 @@ export default function App() {
                         </button>
                       ))}
                     </div>
+
+                    <div className="pt-2 border-t border-slate-200">
+                      <div className="flex justify-between text-[10px] font-mono font-bold text-slate-400 mb-1">
+                        <span>MODULE PROGRESS</span>
+                        <span>{formSellerPortalProgress}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={formSellerPortalProgress}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setFormSellerPortalProgress(val);
+                          if (val === 100) {
+                            setFormSellerPortal("Completed");
+                          } else if (val === 0) {
+                            setFormSellerPortal("Yet to Start");
+                          } else {
+                            setFormSellerPortal("Progressing");
+                          }
+                        }}
+                        className="w-full accent-purple-600 cursor-pointer rounded-none"
+                      />
+                    </div>
                   </div>
 
                   {/* 3. Main App */}
-                  <div className="bg-slate-50 p-4 rounded-none border border-slate-200">
-                    <label className="block text-xs font-bold uppercase tracking-wider font-mono text-black mb-3">
-                      Main app (android)
-                    </label>
+                  <div className="bg-slate-50 p-4 rounded-none border border-slate-200 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-bold uppercase tracking-wider font-mono text-black">
+                        Main app (android)
+                      </label>
+                      <span className="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 border border-purple-200">
+                        {formMainAppProgress}%
+                      </span>
+                    </div>
+
                     <div className="grid grid-cols-3 gap-2">
                       {(["Yet to Start", "Progressing", "Completed"] as ModuleStatus[]).map((status) => (
                         <button
                           key={status}
                           type="button"
-                          onClick={() => setFormMainApp(status)}
+                          onClick={() => {
+                            setFormMainApp(status);
+                            if (status === "Completed") setFormMainAppProgress(100);
+                            if (status === "Yet to Start") setFormMainAppProgress(0);
+                            if (status === "Progressing" && formMainAppProgress === 0) setFormMainAppProgress(25);
+                          }}
                           className={`py-2 text-[10px] sm:text-xs font-bold font-mono uppercase tracking-wider rounded-none border transition-all ${
                             formMainApp === status
                               ? "bg-blue-600 border-blue-600 text-white"
@@ -621,19 +796,55 @@ export default function App() {
                         </button>
                       ))}
                     </div>
+
+                    <div className="pt-2 border-t border-slate-200">
+                      <div className="flex justify-between text-[10px] font-mono font-bold text-slate-400 mb-1">
+                        <span>MODULE PROGRESS</span>
+                        <span>{formMainAppProgress}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={formMainAppProgress}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setFormMainAppProgress(val);
+                          if (val === 100) {
+                            setFormMainApp("Completed");
+                          } else if (val === 0) {
+                            setFormMainApp("Yet to Start");
+                          } else {
+                            setFormMainApp("Progressing");
+                          }
+                        }}
+                        className="w-full accent-purple-600 cursor-pointer rounded-none"
+                      />
+                    </div>
                   </div>
 
                   {/* 4. Partner App */}
-                  <div className="bg-slate-50 p-4 rounded-none border border-slate-200">
-                    <label className="block text-xs font-bold uppercase tracking-wider font-mono text-black mb-3">
-                      Partner app (Android)
-                    </label>
+                  <div className="bg-slate-50 p-4 rounded-none border border-slate-200 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-bold uppercase tracking-wider font-mono text-black">
+                        Partner app (Android)
+                      </label>
+                      <span className="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 border border-purple-200">
+                        {formPartnerAppProgress}%
+                      </span>
+                    </div>
+
                     <div className="grid grid-cols-3 gap-2">
                       {(["Yet to Start", "Progressing", "Completed"] as ModuleStatus[]).map((status) => (
                         <button
                           key={status}
                           type="button"
-                          onClick={() => setFormPartnerApp(status)}
+                          onClick={() => {
+                            setFormPartnerApp(status);
+                            if (status === "Completed") setFormPartnerAppProgress(100);
+                            if (status === "Yet to Start") setFormPartnerAppProgress(0);
+                            if (status === "Progressing" && formPartnerAppProgress === 0) setFormPartnerAppProgress(25);
+                          }}
                           className={`py-2 text-[10px] sm:text-xs font-bold font-mono uppercase tracking-wider rounded-none border transition-all ${
                             formPartnerApp === status
                               ? "bg-blue-600 border-blue-600 text-white"
@@ -643,6 +854,31 @@ export default function App() {
                           {status}
                         </button>
                       ))}
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-200">
+                      <div className="flex justify-between text-[10px] font-mono font-bold text-slate-400 mb-1">
+                        <span>MODULE PROGRESS</span>
+                        <span>{formPartnerAppProgress}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={formPartnerAppProgress}
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setFormPartnerAppProgress(val);
+                          if (val === 100) {
+                            setFormPartnerApp("Completed");
+                          } else if (val === 0) {
+                            setFormPartnerApp("Yet to Start");
+                          } else {
+                            setFormPartnerApp("Progressing");
+                          }
+                        }}
+                        className="w-full accent-purple-600 cursor-pointer rounded-none"
+                      />
                     </div>
                   </div>
                 </div>

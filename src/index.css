@@ -11,3 +11,27 @@ body {
   @apply bg-white text-black antialiased font-sans selection:bg-blue-100 selection:text-blue-900;
   min-height: 100vh;
 }
+
+@keyframes move-bg {
+  0% {
+    background-position: 40px 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.stripe-animation {
+  background-image: linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.2) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.2) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 40px 40px;
+  animation: move-bg 1.2s linear infinite;
+}
